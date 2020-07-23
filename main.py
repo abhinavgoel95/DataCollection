@@ -228,6 +228,8 @@ if args.model_type == "INCEPTION":
     net = inception_v3(pruning = args.prune)
 if args.model_type == "DENSENET":
     net = densenet121(pruning = args.prune)
+if args.model_type == "SHUFFLENET":
+    net = shufflenet_v2_x1_0(pruning = args.prune)
 
 
 net = net.to(device)

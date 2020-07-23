@@ -91,6 +91,13 @@ class Approximate:
             predicted_accuracy_percentage = np.poly1d(function)
             return min(1, predicted_accuracy_percentage(self.prune))
 
+        if self.model_type == 'SHUFFLENET':
+            prune_absolute = [0, 105/556, 263/556, 173/556, 716/3630, 2420/3630, 2570/5670, 0.4478, 0.2267, 0.6, 0.36, 1]
+            accuracy_percentage = [1, (1-0.0682)/(1-0.0524), (1-0.2699)/(1-0.2509), (1-0.06)/(1-0.0524), (1-0.0512)/(1-0.0434), (1-0.2414)/(1-0.2008), (1-0.2719)/(1-0.2535), 0.9316/0.9411, 0.7219/0.7464, (1-0.2449)/(1-0.2320), (1-0.2372)/(1-0.2320), 0]
+            function = np.polyfit(prune_absolute, accuracy_percentage, 4)
+            predicted_accuracy_percentage = np.poly1d(function)
+            return min(1, predicted_accuracy_percentage(self.prune))
+
 
     def resolution_accuracy(self):
         resolution = 1080/self.resolution

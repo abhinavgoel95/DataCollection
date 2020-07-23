@@ -5,9 +5,9 @@ import os.path
 from os import path
 import sys
 
-for index in [0,2,3,4,5]:
+for index in [0]:
     print(index)
-    models = ["VGG16", "VGG19", "RESNET", "MOBILENET", "INCEPTION", "DENSENET"]
+    models = ["SHUFFLENET", "VGG16", "VGG19", "RESNET", "MOBILENET", "INCEPTION", "DENSENET"]
     pruning = list(np.arange(0., 1.1, 0.1))
     quant = ['float32', 'float16', 'int8']
     res = list(np.arange(1, 5.1, 0.5))
@@ -25,12 +25,3 @@ for index in [0,2,3,4,5]:
         for j in pruning:
             for k in sampling_rate:
                 os.system("python main.py --benchmarks --resolution {res} --fps 30 --prune {prune} --sampling_rate {samp} --output_file {fname} --model {model_name}".format(samp = k, model_name=models[index], res=i, prune = j, fname=filename, quant = "float32"))
-
-    # k = j = 1
-    # for i in res:
-    #     os.system("python main.py --benchmarks --data_collection --resolution {res} --fps 1000 --output_file {fname} --model {model_name}".format(samp = k, model_name=models[index], res=i, prune = j, fname=filename, quant = "float32"))
-                
-    # i = 3.5
-    # j = 0
-    # for k in sampling_rate:
-    #     os.system("python main.py --benchmarks --resolution {res} --prune {prune} --sampling_rate {samp} --output_file {fname} --model {model_name}".format(samp = k, model_name=models[index], res=i, prune = j, fname=filename, quant = "float32"))
