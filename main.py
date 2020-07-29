@@ -115,8 +115,8 @@ def benchmark(net):
         output_fps = (count)/time_taken
 
     else:
-        approximator = Approximate(macs, args.res*224, args.prune, args.model_type)
-        acc, _ = approximator.get_approximates()
+        approximator = Approximate(macs, args.res*224, args.prune, args.quant, args.model_type)
+        acc, speedup = approximator.get_approximates()
         length = 4
         video = InputVideo(int(224*args.res),int(224*args.res), args.fps, length, "generated_video.avi")
         video.create_video()
@@ -125,8 +125,8 @@ def benchmark(net):
         count, time_taken = latency.measure_latency()
         cap.release()
         output_fps = (count)/time_taken
+        output_fps *= speedup
         acc = max(acc, 1/1000)
-        #output_fps = args.samp_rate*args.fps
         macs = macs*(output_fps)
 
     print(args.model_type, round(args.prune,2), args.quant, round(args.test_bs,2), round(args.samp_rate,2), round(args.res*224,2), round(acc,3), output_fps, macs)
@@ -230,6 +230,8 @@ if args.model_type == "DENSENET":
     net = densenet121(pruning = args.prune)
 if args.model_type == "SHUFFLENET":
     net = shufflenet_v2_x1_0(pruning = args.prune)
+if args.model_type == "GOOGLENET":
+    net = googlenet(pruning = args.prune)
 
 
 net = net.to(device)

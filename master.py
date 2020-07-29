@@ -5,9 +5,9 @@ import os.path
 from os import path
 import sys
 
-models = ["VGG16", "VGG19", "RESNET", "MOBILENET", "EFFICIENTNET"]
+models = ["GOOGLENET", "VGG16", "VGG19", "RESNET", "MOBILENET", "EFFICIENTNET"]
 pruning = list(np.arange(0,1.1,0.1))
-quant = ['float32', 'float16', 'int8']
+quant = ['float32', 'int8', 'int7', 'int6', 'int5']
 res = list(np.arange(0.3, 5,0.2))
 sampling_rate = list(np.arange(0.1, 1.1, 0.1))
 cpu_only = [False, True]
@@ -22,5 +22,6 @@ with open(filename, 'w') as csvfile:
 for i in pruning:
     for j in res:
         for k in sampling_rate:
-            os.system("python main.py --resume saved_models/model_{model_name}_{quant}.pth.tar --benchmarks --prune {pruning} --resolution {resolution} --sampling_rate {samp} --output_file {fname}".format(model_name=models[0], pruning=i, resolution=j, samp=k, fname=filename, quant = "float32"))
+            for q in quant:
+                os.system("python main.py --resume saved_models/model_{model_name}_{quantization}.pth.tar --benchmarks --prune {pruning} --resolution {resolution} --sampling_rate {samp} --quant {quantization} --output_file {fname}".format(model_name=models[0], pruning=i, quantization=q, resolution=j, samp=k, fname=filename))
             

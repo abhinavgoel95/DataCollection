@@ -1,15 +1,33 @@
 import numpy as np
 
 class Approximate:
-    def __init__(self, macs, res, prune, model_type = 'VGG16'):
+    def __init__(self, macs, res, prune, quant, model_type = 'VGG16'):
         self.macs = macs
         self.resolution = res
         self.prune = prune
         self.model_type = model_type
+        self.quant = quant
     
     def get_approximates(self):
-        return self.prune_accuracy()*self.resolution_accuracy(), self.macs_gpu_fps()
+        quant_acc_drop, quant_fps_speedup = self.qaunt_performance()
+        return self.prune_accuracy()*self.resolution_accuracy()*quant_acc_drop, quant_fps_speedup
 
+    def qaunt_performance(self):
+        def estimate_accuracy_loss():
+            lookup = {'VGG16': {'int8': 0.997, 'int7': 0.983, 'int6': 0.845, 'int5': 0.219}}
+            return lookup[self.model_type][self.quant]
+
+        def estimate_speed_up():
+            lookup = {'VGG16': {'int8': 2, 'int7': 2.1, 'int6': 2.2, 'int5': 2.3}}
+            return lookup[self.model_type][self.quant]
+
+        def estimate_performance():
+            return estimate_accuracy_loss(), estimate_speed_up()
+
+        return estimate_performance()
+    
+print(df)    
+    
     def macs_gpu_fps(self):
         macs = self.macs/1e9
         if self.model_type == 'VGG16':
@@ -91,9 +109,9 @@ class Approximate:
             predicted_accuracy_percentage = np.poly1d(function)
             return min(1, predicted_accuracy_percentage(self.prune))
 
-        if self.model_type == 'SHUFFLENET':
-            prune_absolute = [0, 105/556, 263/556, 173/556, 716/3630, 2420/3630, 2570/5670, 0.4478, 0.2267, 0.6, 0.36, 1]
-            accuracy_percentage = [1, (1-0.0682)/(1-0.0524), (1-0.2699)/(1-0.2509), (1-0.06)/(1-0.0524), (1-0.0512)/(1-0.0434), (1-0.2414)/(1-0.2008), (1-0.2719)/(1-0.2535), 0.9316/0.9411, 0.7219/0.7464, (1-0.2449)/(1-0.2320), (1-0.2372)/(1-0.2320), 0]
+        if self.model_type == 'GOOGLENET':
+            prune_absolute = [0, 1-1250/1300, 1-1150/1300, 1-1100/1300, 1-1050/1300, 1-1040/1300, 1-1000/1300, 1-900/1300, 1-850/1300, 1-750/1300, 1-350/1300, 1]
+            accuracy_percentage = [1, 1, 1, 1, 70/70.5, 69.9/70.5, 69.5/70.5, 69/70.5, 69/70.5, 64/70.5, 52/70.5, 0]
             function = np.polyfit(prune_absolute, accuracy_percentage, 4)
             predicted_accuracy_percentage = np.poly1d(function)
             return min(1, predicted_accuracy_percentage(self.prune))
